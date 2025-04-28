@@ -233,9 +233,25 @@ func articlesCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func createTables() {
+	createArticlesSQL := `CREATE TABLE IF NOT EXISTS articles(
+    id bigint(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+    body longtext COLLATE utf8mb4_unicode_ci
+); `
+
+	_, err := db.Exec(createArticlesSQL)
+	checkError(err)
+}
+
+type Result interface {
+	LastInsertId() (int64, error) // 使用 INSERT 向数据插入记录，数据表有自增 id 时，该函数有返回值
+	RowsAffected() (int64, error) // 表示影响的数据表行数
+}
+
 func main() {
 	initDB()
-
+	createTables()
 	fmt.Println(config.FormatDSN())
 	// router := mux.NewRouter()
 
