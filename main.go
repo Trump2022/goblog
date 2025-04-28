@@ -244,15 +244,25 @@ func createTables() {
 	checkError(err)
 }
 
-type Result interface {
-	LastInsertId() (int64, error) // 使用 INSERT 向数据插入记录，数据表有自增 id 时，该函数有返回值
-	RowsAffected() (int64, error) // 表示影响的数据表行数
+func createTables() {
+	createArticlesSQL := `CREATE TABLE IF NOT EXISTS articles(
+		id bigint(20) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+		title varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+		body longtext COLLATE utf8mb4_unicode_ci
+	); `
+
+	_, err := db.Exec(createArticlesSQL)
+	checkError(err)
+}
+
+func init() {
+	sql.Register("mysql", &MySQLDriver{})
 }
 
 func main() {
 	initDB()
 	createTables()
-	fmt.Println(config.FormatDSN())
+
 	// router := mux.NewRouter()
 
 	router.HandleFunc("/", homeHandler).Methods("GET").Name("home")
