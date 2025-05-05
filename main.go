@@ -73,6 +73,16 @@ type Article struct {
 	ID          int64
 }
 
+func (a Article) Link() string {
+	showURL, err := router.Get("articles.show").URL("id", strconv.FormatInt(a.ID, 10))
+	if err != nil {
+		checkError(err)
+		return ""
+	}
+
+	return showURL.String()
+}
+
 func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
 	// vars := mux.Vars(r)
 	// id := vars["id"]
@@ -490,7 +500,36 @@ func articlesUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func articlesIndexHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "访问文章列表")
+	// fmt.Fprint(w, "访问文章列表")
+	//执行查询语句, 返回一个结果集
+	rows, err := db.Query("SELECT * from articles")
+	checkError(err)
+	defer rows.Close()
+
+	var articles []Article
+
+	//2. 循环读取结果
+	for rows.Next() {
+		var article Article
+		//2.1 扫描每一行的结果并赋值到一个article对象中
+		err := rows.Scan(&article.ID, &article.Title, &article.Body)
+		checkError(err)
+		//2.2 将article 追加到articles 的这个数组中
+		articles = append(articles, article)
+	}
+
+	// 2.3 检测遍历时是否发生错误
+	err = rows.Err()
+	checkError(err)
+
+	// 3.加载模板
+	tmpl, err := template.ParseFiles("resources/views/articles/index.gohtml")
+	checkError(err)
+
+	// 4. 渲染模板, 将所有文章的数据传输进去
+	err = tmpl.Execute(w, articles)
+	checkError(err)
+
 }
 
 func main() {
