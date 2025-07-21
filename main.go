@@ -616,9 +616,11 @@ func (a Article) Delete() (rowsAffected int64, err error) {
 }
 
 func main() {
-	initDB()
-	createTables()
+	database.Initialize()
+	db = database.DB
 
+	bootstrap.SetupDB()
+	router = bootstrap.SetupRoute()
 	// router := mux.NewRouter()
 
 	// router.HandleFunc("/", homeHandler).Methods("GET").Name("home")
