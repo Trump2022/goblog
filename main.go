@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"goblog/bootstrap"
 	"log"
 	"net/http"
 	"net/url"
@@ -16,7 +17,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var router = mux.NewRouter()
+// var router = mux.NewRouter()
+var router = bootstrap.SetupRoute()
 var db *sql.DB
 
 func initDB() {
@@ -83,54 +85,54 @@ func (a Article) Link() string {
 	return showURL.String()
 }
 
-func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// id := vars["id"]
-	// fmt.Fprint(w, "文章 ID："+id)
+// func articlesShowHandler(w http.ResponseWriter, r *http.Request) {
+// 	// vars := mux.Vars(r)
+// 	// id := vars["id"]
+// 	// fmt.Fprint(w, "文章 ID："+id)
 
-	// 1.获取 URL 参数
-	id := getRouteVariable("id", r)
-	// vars := mux.Vars(r)
-	// id := vars["id"]
+// 	// 1.获取 URL 参数
+// 	id := getRouteVariable("id", r)
+// 	// vars := mux.Vars(r)
+// 	// id := vars["id"]
 
-	// 2. 读取对应的文章数据
-	article, err := getArticleByID(id)
-	// article := Article{}
-	// query := "SELECT * From articles WHERE id = ?"
-	// err := db.QueryRow(query, id).Scan(&article.ID, &article.Title, &article.Body)
+// 	// 2. 读取对应的文章数据
+// 	article, err := getArticleByID(id)
+// 	// article := Article{}
+// 	// query := "SELECT * From articles WHERE id = ?"
+// 	// err := db.QueryRow(query, id).Scan(&article.ID, &article.Title, &article.Body)
 
-	// stmt, err := db.Prepare(query)
-	// checkError(err)
-	// defer stmt.Close()
-	// err = stmt.QueryRow(id).Scan(&article.ID, &article.Title, &article.Body)
+// 	// stmt, err := db.Prepare(query)
+// 	// checkError(err)
+// 	// defer stmt.Close()
+// 	// err = stmt.QueryRow(id).Scan(&article.ID, &article.Title, &article.Body)
 
-	// 3. 如果出现错误
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// 3.1 数据未找到
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Fprint(w, "404 文章未找到")
-		} else {
-			// 3.2 数据库错误
-			checkError(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "500服务器内部错误")
-		}
-	} else {
-		// 4. 读取成功, 显示文章
-		// fmt.Fprint(w, "读取成功, 文章标题 --"+article.Title)
-		// tmpl, err := template.ParseFiles("resources/views/articles/show.gohtml")
+// 	// 3. 如果出现错误
+// 	if err != nil {
+// 		if err == sql.ErrNoRows {
+// 			// 3.1 数据未找到
+// 			w.WriteHeader(http.StatusNotFound)
+// 			fmt.Fprint(w, "404 文章未找到")
+// 		} else {
+// 			// 3.2 数据库错误
+// 			checkError(err)
+// 			w.WriteHeader(http.StatusInternalServerError)
+// 			fmt.Fprint(w, "500服务器内部错误")
+// 		}
+// 	} else {
+// 		// 4. 读取成功, 显示文章
+// 		// fmt.Fprint(w, "读取成功, 文章标题 --"+article.Title)
+// 		// tmpl, err := template.ParseFiles("resources/views/articles/show.gohtml")
 
-		tmpl, err := template.New("show.gohtml").Funcs(template.FuncMap{
-			"RouteName2URL": RouteName2URL,
-			"Int64ToString": Int64ToString,
-		}).ParseFiles("resources/views/articles/show.gohtml")
-		checkError(err)
-		err = tmpl.Execute(w, article)
-		checkError(err)
-	}
+// 		tmpl, err := template.New("show.gohtml").Funcs(template.FuncMap{
+// 			"RouteName2URL": RouteName2URL,
+// 			"Int64ToString": Int64ToString,
+// 		}).ParseFiles("resources/views/articles/show.gohtml")
+// 		checkError(err)
+// 		err = tmpl.Execute(w, article)
+// 		checkError(err)
+// 	}
 
-}
+// }
 
 // RouteName2URL 通过路由名称来获取 URL
 func RouteName2URL(routeName string, pairs ...string) string {
@@ -622,7 +624,7 @@ func main() {
 	// router.HandleFunc("/", homeHandler).Methods("GET").Name("home")
 	// router.HandleFunc("/about", aboutHandler).Methods("GET").Name("about")
 
-	router.HandleFunc("/articles/{id:[0-9]+}", articlesShowHandler).Methods("GET").Name("articles.show")
+	// router.HandleFunc("/articles/{id:[0-9]+}", articlesShowHandler).Methods("GET").Name("articles.show")
 	router.HandleFunc("/articles", articlesIndexHandler).Methods("GET").Name("articles.index")
 	router.HandleFunc("/articles", articlesStoreHandler).Methods("POST").Name("articles.store")
 	router.HandleFunc("/articles/create", articlesCreateHandler).Methods("GET").Name("articles.create")
